@@ -75,7 +75,7 @@ function App() {
             return (
               <div key={index} className="col-md-3 mb-3 d-flex justify-content-center">
               <div 
-                className="card h-100 shadow-sm text-white" 
+                className="card h-100 shadow-sm text-white pokemon-card-shining" 
                 style={{ width: '18rem', background: cardBackground }}
               >
                 <img 
