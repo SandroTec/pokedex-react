@@ -22,28 +22,26 @@ const typeColors = {
 };
 
 function App() {
-    // 1. Ein State für unsere Pokémon-Liste (Standardwert ist ein leeres Array)
     const [pokemonList, setPokemonList] = useState([]);
 
-    // 2. Der useEffect für den API-Aufruf beim Laden der Seite
     useEffect(() => {
-      // Hier kommt deine Fetch-Logik rein!
+      // to fetch pokemon from pokeAPI
       const fetchPokemon = async () => {
         try {
-          // 1. Die Hauptliste holen
+          // load 30 pkmn
           const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=30');
           const data = await response.json();
 
-          // 2. Für jedes Pokémon aus data.results die Details fetchen (erstellt ein Array von Promises)
+          // fetch all Pkmn details
           const detailPromises = data.results.map(async (pokemon) => {
             const detailResponse = await fetch(pokemon.url);
-            return await detailResponse.json(); // Hier stecken jetzt die echten Details drin!
+            return await detailResponse.json(); // transform to json
           });
 
-          // 3. Warten, bis alle 30 Fetch-Aufrufe erfolgreich abgeschlossen sind
+          // wait till all promises completet
           const detailedPokemonResults = await Promise.all(detailPromises);
 
-          // 4. Jetzt speichern wir die detaillierten Pokémon im State
+          // save detailed Pkmn in state
           setPokemonList(detailedPokemonResults);
         } catch (error) {
           console.error("Fehler beim Laden:", error);
@@ -51,7 +49,7 @@ function App() {
       };
 
       fetchPokemon();
-    }, []); // Das leere Array hier hinten sorgt dafür, dass es nur 1x beim Laden läuft!
+    }, []); // empty array used to only load ones
 
     return (
       <div>
