@@ -52,12 +52,13 @@ function App() {
     }, []); // empty array used to only load ones
 
     return (
-      <div>
-        <div className="container text-center mt-5">
-          <h1 className="display-4 text-danger"><strong>Pokedex</strong></h1>
+      <div className="container my-pokedex-container mt-5">
+      
+        <div className="text-center mb-5">
+          <h1 className="display-4 text-danger">Pokedex</h1>
         </div>
 
-        <div className="row">
+        <div className="row justify-content-center">
           {pokemonList.map((pokemon, index) => {
             // 1. mapping the types
             const types = pokemon.types?.map(t => t.type.name) || ['normal'];
@@ -72,15 +73,21 @@ function App() {
             const cardBackground = `linear-gradient(135deg, ${color1} 50%, ${color2} 50%)`;
 
             return (
-              <div key={index} className="col-md-3 mb-3">
-                <div 
-                  className="card h-100 shadow-sm text-white" 
-                  style={{ width: '18rem', background: cardBackground }}
-                >
-                  <img src={pokemon.sprites?.front_default} className="card-img-top" alt="Pokemon-Image" /> 
-                  <div className="card-body">
-                    <h5 className="card-title text-capitalize">{pokemon.name}</h5>
-                    <p className="card-text">
+              <div key={index} className="col-md-3 mb-3 d-flex justify-content-center">
+              <div 
+                className="card h-100 shadow-sm text-white" 
+                style={{ width: '18rem', background: cardBackground }}
+              >
+                <img 
+                  src={pokemon.sprites?.front_default} 
+                  className="card-img-top" 
+                  alt={pokemon.name} 
+                /> 
+                
+                <div className="card-body">
+                  <h5 className="card-title text-capitalize">{pokemon.name}</h5>
+                  
+                  <p className="card-text">
                       Type: {types.join(' / ').toUpperCase()} <br />
                       HP: {pokemon.stats?.[0]?.base_stat} <br />
                       Attack: {pokemon.stats?.[1]?.base_stat} <br />

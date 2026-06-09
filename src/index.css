@@ -3,5 +3,8 @@
   padding: 0;
 }
 
-
-
+.my-pokedex-container {
+  max-width: 1440px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
