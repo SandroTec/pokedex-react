@@ -23,53 +23,75 @@ const typeColors = {
 
 function App() {
     const [pokemonList, setPokemonList] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [offset, setOffset] = useState(30);
 
-    useEffect(() => {
-      // to fetch pokemon from pokeAPI
-      const fetchPokemon = async () => {
+
+      const fetchPokemon = async (currentOffset = 0) => {
         try {
-          // load 30 pkmn
-          const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=30');
+          const response = await fetch(
+            `https://pokeapi.co/api/v2/pokemon?limit=30&offset=${currentOffset}`
+          );
+
           const data = await response.json();
 
-          // fetch all Pkmn details
           const detailPromises = data.results.map(async (pokemon) => {
             const detailResponse = await fetch(pokemon.url);
-            return await detailResponse.json(); // transform to json
+            return await detailResponse.json();
           });
 
-          // wait till all promises completet
-          const detailedPokemonResults = await Promise.all(detailPromises);
-
-          // save detailed Pkmn in state
-          setPokemonList(detailedPokemonResults);
+          return await Promise.all(detailPromises);
         } catch (error) {
           console.error("Fehler beim Laden:", error);
+          return [];
         }
       };
 
-      fetchPokemon();
-    }, []); // empty array used to only load ones
+      useEffect(() => {
+        const loadInitialPokemon = async () => {
+          const pokemon = await fetchPokemon(0);
+
+          setPokemonList(pokemon);
+        };
+
+        loadInitialPokemon();
+      }, []);
+
+      const loadMorePokemon = async () => {
+        const pokemon = await fetchPokemon(offset);
+
+        setPokemonList((prev) => [...prev, ...pokemon]);
+
+        setOffset((prev) => prev + 30);
+      };
 
     return (
       <div className="container my-pokedex-container mt-5">
       
         <div className="text-center mb-5">
           <h1 className="display-4 text-danger">Pokedex</h1>
+          <div className="row justify-content-center mb-4">
+            <div className="col-md-6">
+              <input
+                type="text"
+                className="form-control form-control-lg text-center"
+                placeholder="Pokémon suchen..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
         </div>
 
         <div className="row justify-content-center">
-          {pokemonList.map((pokemon, index) => {
-            // 1. mapping the types
+          {pokemonList
+            .filter((pokemon) => 
+              pokemon.name.toLowerCase().includes(searchTerm.toLowerCase())
+            )
+            .map((pokemon, index) => {
             const types = pokemon.types?.map(t => t.type.name) || ['normal'];
-            
-            // 2. first color
             const color1 = typeColors[types[0]] || typeColors.normal;
-            
-            // 3. second color or first one again
             const color2 = typeColors[types[1]] || color1;
-
-            // 4. css bg with 135 deg.
             const cardBackground = `linear-gradient(135deg, ${color1} 50%, ${color2} 50%)`;
 
             return (
@@ -79,7 +101,7 @@ function App() {
                 style={{ width: '18rem', background: cardBackground }}
               >
                 <img 
-                  src={pokemon.sprites?.front_default} 
+                  src={pokemon.sprites?.other?.dream_world?.front_default} 
                   className="card-img-top" 
                   alt={pokemon.name} 
                 /> 
@@ -102,6 +124,12 @@ function App() {
               </div>
             );
           })}
+        </div>
+
+        <div className="text-center mt-4 mb-5">
+          <button className="btn btn-danger btn-lg" onClick={loadMorePokemon}>
+            load more
+          </button>
         </div>
       </div>
     );
