@@ -137,9 +137,9 @@ function App() {
               );
 
   return (
-    <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.6)' }} tabIndex="-1">
+    <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.6)'}} tabIndex="-1" >
       <div className="modal-dialog modal-dialog-centered">
-        <div className="modal-content text-dark">
+        <div className="modal-content text-dark" style={{height: '700px'},{width: '450px'}}>
           
           <div className="modal-header">
             <h2 className="modal-title text-capitalize">{selectedPokemon.name}</h2>
@@ -152,13 +152,13 @@ function App() {
           </div>
 
           <div 
-            className="modal-body text-center text-white" 
+            className="modal-body text-center text-black" 
             style={{ background: modalBg }}
           >
             <img 
               src={selectedPokemon.sprites?.other?.dream_world?.front_default || selectedPokemon.sprites?.front_default} 
               alt={selectedPokemon.name} 
-              style={{ width: '150px' }} 
+              style={{ width: '200px' }} 
             />
             
             <p className="mt-3">
