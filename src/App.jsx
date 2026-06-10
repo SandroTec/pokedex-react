@@ -25,8 +25,7 @@ function App() {
     const [pokemonList, setPokemonList] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [offset, setOffset] = useState(30);
-
-
+    const [selectedPokemon, setSelectedPokemon] = useState(null);
       const fetchPokemon = async (currentOffset = 0) => {
         try {
           const response = await fetch(
@@ -69,7 +68,7 @@ function App() {
       <div className="container my-pokedex-container mt-5">
       
         <div className="text-center mb-5">
-          <h1 className="display-4 text-danger">Pokedex</h1>
+          <h1 className="display-4 text-danger"><strong>Pokedex</strong></h1>
           <div className="row justify-content-center mb-4">
             <div className="col-md-6">
               <input
@@ -98,7 +97,8 @@ function App() {
               <div key={index} className="col-md-3 mb-3 d-flex justify-content-center">
               <div 
                 className="card h-100 shadow-sm text-white pokemon-card-shining" 
-                style={{ width: '18rem', background: cardBackground }}
+                style={{ width: '18rem', background: cardBackground, cursor: 'pointer' }}
+                onClick={() => setSelectedPokemon(pokemon)} 
               >
                 <img 
                   src={pokemon.sprites?.other?.dream_world?.front_default} 
@@ -107,17 +107,11 @@ function App() {
                 /> 
                 
                 <div className="card-body">
-                  <h5 className="card-title text-capitalize">{pokemon.name}</h5>
+                  <h3 className="card-title text-capitalize">{pokemon.name}</h3>
                   
                   <p className="card-text">
                       Type: {types.join(' / ').toUpperCase()} <br />
-                      HP: {pokemon.stats?.[0]?.base_stat} <br />
-                      Attack: {pokemon.stats?.[1]?.base_stat} <br />
-                      Defense: {pokemon.stats?.[2]?.base_stat} <br />
-                      Special Att.: {pokemon.stats?.[3]?.base_stat} <br />
-                      Special Def.: {pokemon.stats?.[4]?.base_stat} <br />
-                      Speed: {pokemon.stats?.[5]?.base_stat} <br />
-                      Weight: {pokemon.weight}
+                      
                     </p>
                   </div>
                 </div>
@@ -131,6 +125,102 @@ function App() {
             load more
           </button>
         </div>
+        
+        {selectedPokemon && (() => {
+          const modalTypes = selectedPokemon.types?.map(t => t.type.name) || ['normal'];
+          const modalColor1 = typeColors[modalTypes[0]] || typeColors.normal;
+          const modalColor2 = typeColors[modalTypes[1]] || modalColor1;
+          const modalBg = `linear-gradient(135deg, ${modalColor1} 50%, ${modalColor2} 50%)`;
+
+          const filteredPokemon = pokemonList.filter((pokemon) =>
+                pokemon.name.toLowerCase().includes(searchTerm.toLowerCase())
+              );
+
+  return (
+    <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.6)' }} tabIndex="-1">
+      <div className="modal-dialog modal-dialog-centered">
+        <div className="modal-content text-dark">
+          
+          <div className="modal-header">
+            <h2 className="modal-title text-capitalize">{selectedPokemon.name}</h2>
+            <button 
+              type="button" 
+              className="btn-close bg-danger" 
+              onClick={() => setSelectedPokemon(null)} 
+              
+            ></button>
+          </div>
+
+          <div 
+            className="modal-body text-center text-white" 
+            style={{ background: modalBg }}
+          >
+            <img 
+              src={selectedPokemon.sprites?.other?.dream_world?.front_default || selectedPokemon.sprites?.front_default} 
+              alt={selectedPokemon.name} 
+              style={{ width: '150px' }} 
+            />
+            
+            <p className="mt-3">
+              <strong>Type:</strong> {modalTypes.join(' / ').toUpperCase()} <br />
+              <strong>Gewicht:</strong> {selectedPokemon.weight} kg <br />
+              <strong>Größe:</strong> {selectedPokemon.height / 10} m <br />
+              <strong>HP:</strong> {selectedPokemon.stats?.[0]?.base_stat} <br />
+              <strong>Attack:</strong> {selectedPokemon.stats?.[1]?.base_stat} <br />
+              <strong>Defense:</strong> {selectedPokemon.stats?.[2]?.base_stat} <br />
+              <strong>Special Attack:</strong> {selectedPokemon.stats?.[3]?.base_stat} <br />
+              <strong>Special Defense:</strong> {selectedPokemon.stats?.[4]?.base_stat} <br />
+              <strong>Speed:</strong> {selectedPokemon.stats?.[5]?.base_stat}
+            </p>
+          </div>
+
+          <div className="modal-footer d-flex justify-content-between w-100">
+            {(() => {
+              const currentIndex = filteredPokemon.findIndex(p => p.id === selectedPokemon.id);
+
+              const handlePrev = () => {
+                if (currentIndex > 0) {
+                  setSelectedPokemon(filteredPokemon[currentIndex - 1]);
+                }
+              };
+
+              const handleNext = () => {
+                if (currentIndex < filteredPokemon.length - 1) {
+                  setSelectedPokemon(filteredPokemon[currentIndex + 1]);
+                }
+              };
+
+              
+              return (
+                <>
+                  <button 
+                    type="button" 
+                    className="btn btn-secondary" 
+                    onClick={handlePrev}
+                    disabled={currentIndex === 0}
+                  >
+                    ← 
+                  </button>
+
+
+                  <button 
+                    type="button" 
+                    className="btn btn-primary" 
+                    onClick={handleNext}
+                    disabled={currentIndex === filteredPokemon.length - 1}
+                  >
+                     →
+                  </button>
+                </>
+              );
+            })()}
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+})()}
       </div>
     );
 }
